@@ -2,7 +2,7 @@
  {
   "creation": "2013-09-19 12:45:25", 
   "docstatus": 0, 
-  "modified": "2013-09-19 15:58:16", 
+  "modified": "2013-09-19 16:39:57", 
   "modified_by": "Administrator", 
   "owner": "Administrator"
  }, 
@@ -45,6 +45,13 @@
  }, 
  {
   "doctype": "DocField", 
+  "fieldname": "data_set", 
+  "fieldtype": "Link", 
+  "label": "Data Set", 
+  "options": "Data Set"
+ }, 
+ {
+  "doctype": "DocField", 
   "fieldname": "data_head", 
   "fieldtype": "Link", 
   "label": "Data Head", 
@@ -63,6 +70,18 @@
   "fieldtype": "Link", 
   "label": "Region", 
   "options": "Region"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "row_id", 
+  "fieldtype": "Int", 
+  "label": "Row Id"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "col_id", 
+  "fieldtype": "Int", 
+  "label": "Col Id"
  }, 
  {
   "doctype": "DocPerm"
