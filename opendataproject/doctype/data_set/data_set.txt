@@ -1,0 +1,34 @@
+[
+ {
+  "creation": "2013-09-19 12:43:30", 
+  "docstatus": 0, 
+  "modified": "2013-09-19 12:43:30", 
+  "modified_by": "Administrator", 
+  "owner": "Administrator"
+ }, 
+ {
+  "autoname": "Prompt", 
+  "custom": 0, 
+  "doctype": "DocType", 
+  "module": "OpenDataProject", 
+  "name": "__common__"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "source", 
+  "fieldtype": "Data", 
+  "label": "Source", 
+  "name": "__common__", 
+  "parent": "Data Set", 
+  "parentfield": "fields", 
+  "parenttype": "DocType", 
+  "permlevel": 0
+ }, 
+ {
+  "doctype": "DocType", 
+  "name": "Data Set"
+ }, 
+ {
+  "doctype": "DocField"
+ }
+]
