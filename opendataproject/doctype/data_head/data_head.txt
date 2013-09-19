@@ -2,7 +2,7 @@
  {
   "creation": "2013-09-19 12:44:09", 
   "docstatus": 0, 
-  "modified": "2013-09-19 12:44:09", 
+  "modified": "2013-09-19 15:17:21", 
   "modified_by": "Administrator", 
   "owner": "Administrator"
  }, 
@@ -14,11 +14,7 @@
  }, 
  {
   "doctype": "DocField", 
-  "fieldname": "data_set", 
-  "fieldtype": "Link", 
-  "label": "Data Set", 
   "name": "__common__", 
-  "options": "Data Set", 
   "parent": "Data Head", 
   "parentfield": "fields", 
   "parenttype": "DocType", 
@@ -29,6 +25,16 @@
   "name": "Data Head"
  }, 
  {
-  "doctype": "DocField"
+  "doctype": "DocField", 
+  "fieldname": "data_set", 
+  "fieldtype": "Link", 
+  "label": "Data Set", 
+  "options": "Data Set"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "title", 
+  "fieldtype": "Small Text", 
+  "label": "Title"
  }
 ]

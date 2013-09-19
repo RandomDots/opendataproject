@@ -2,7 +2,7 @@
  {
   "creation": "2013-09-19 12:42:41", 
   "docstatus": 0, 
-  "modified": "2013-09-19 12:42:50", 
+  "modified": "2013-09-19 15:57:54", 
   "modified_by": "Administrator", 
   "owner": "Administrator"
  }, 
@@ -19,6 +19,20 @@
   "parentfield": "fields", 
   "parenttype": "DocType", 
   "permlevel": 0
+ }, 
+ {
+  "cancel": 1, 
+  "create": 1, 
+  "doctype": "DocPerm", 
+  "name": "__common__", 
+  "parent": "Region", 
+  "parentfield": "permissions", 
+  "parenttype": "DocType", 
+  "permlevel": 0, 
+  "read": 1, 
+  "report": 1, 
+  "role": "System Manager", 
+  "write": 1
  }, 
  {
   "doctype": "DocType", 
@@ -42,5 +56,14 @@
   "fieldtype": "Link", 
   "label": "Parent Region", 
   "options": "Region"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "region_type", 
+  "fieldtype": "Data", 
+  "label": "Region Type"
+ }, 
+ {
+  "doctype": "DocPerm"
  }
 ]

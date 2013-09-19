@@ -2,7 +2,7 @@
  {
   "creation": "2013-09-19 12:43:30", 
   "docstatus": 0, 
-  "modified": "2013-09-19 12:43:30", 
+  "modified": "2013-09-19 15:58:33", 
   "modified_by": "Administrator", 
   "owner": "Administrator"
  }, 
@@ -15,9 +15,6 @@
  }, 
  {
   "doctype": "DocField", 
-  "fieldname": "source", 
-  "fieldtype": "Data", 
-  "label": "Source", 
   "name": "__common__", 
   "parent": "Data Set", 
   "parentfield": "fields", 
@@ -25,10 +22,52 @@
   "permlevel": 0
  }, 
  {
+  "doctype": "DocPerm", 
+  "name": "__common__", 
+  "parent": "Data Set", 
+  "parentfield": "permissions", 
+  "parenttype": "DocType", 
+  "permlevel": 0, 
+  "read": 1, 
+  "report": 1, 
+  "role": "System Manager", 
+  "write": 1
+ }, 
+ {
   "doctype": "DocType", 
   "name": "Data Set"
  }, 
  {
-  "doctype": "DocField"
+  "doctype": "DocField", 
+  "fieldname": "source", 
+  "fieldtype": "Data", 
+  "label": "Source"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "classification", 
+  "fieldtype": "Data", 
+  "label": "Classification"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "description", 
+  "fieldtype": "Text", 
+  "label": "Description"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "raw_filename", 
+  "fieldtype": "Data", 
+  "label": "Raw Filename"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "url", 
+  "fieldtype": "Small Text", 
+  "label": "url"
+ }, 
+ {
+  "doctype": "DocPerm"
  }
 ]
