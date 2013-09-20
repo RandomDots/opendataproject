@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import webnotes, utils, MySQLdb, os, json
+import webnotes, utils, MySQLdb, os, json, re
 
 exclude_from_headers = {
 	"Download XLS for ": "",
@@ -73,20 +73,38 @@ def add_values(fname, fpath):
 	webnotes.conn.commit()
 	
 def add_regions(data):
+	def scrub(text):
+		text = text.strip().title()
+
+		for w in ("Total", "State", "Grand"):
+			if w in text:
+				return ""
+
+		text = re.sub("\([^)]\)", "", text)
+		text = re.sub("D[ .]*and[ .]*N", "Dadra and Nagar", text)
+		text = re.sub("Ch[h]*at[t]*isgarh", "Chattisgarh", text.replace(" ", "").title())
+		text = re.sub("J[ .]*&[ .]*K", "Jammu & Kashmir", text)
+		text = re.sub("A[ .]*&[ .]*N", "Andaman & Nicobar", text)
+		text = re.sub("Andaman[ .]*&[ .]*Nicobar[s ]*\w*", "Andaman & Nicobar Islands", text)
+		
+		return text
+		
 	if data[0][0].lower()=="state":
 		states = list(set(d[0] for d in data[1:]))
 		for d in states:
-			if not webnotes.conn.exists("Region", d.title().strip()):
+			name = scrub(d)
+			if name and not webnotes.conn.exists("Region", name):
 				webnotes.bean({"doctype":"Region", "region_type":"State", 
-					"name":d.title().strip() }).insert()
+					"name": name }).insert()
 					
 		webnotes.conn.commit()
 					
 		if data[0][1].lower()=="district":
 			for row in data[1:]:
-				if row[1] and not webnotes.conn.exists("Region", row[1].title().strip()):
+				name = scrub(row[1])
+				if name and row[1] and not webnotes.conn.exists("Region", name):
 					webnotes.bean({"doctype": "Region", "region_type":"District", 
-						"parent_region": row[0].title(), "name": row[1].title().strip() }).insert()
+						"parent_region": scrub(row[0]), "name": name }).insert()
 					
 			webnotes.conn.commit()
 
