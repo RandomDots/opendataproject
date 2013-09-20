@@ -11,8 +11,7 @@ class DocType:
 		self.doc, self.doclist = d, dl
 		
 	def get_context(self):
-		from data.utils import get_file_data
-		from webnotes.utils import get_path
-		headers, self.doc.data = get_file_data(get_path("app", "downloads", 
-			"data.gov.in", self.doc.raw_filename))
-		self.doc.max_cols = max([len(r) for r in self.doc.data])
+		self.doc.data_sets = webnotes.conn.sql("""select ds.name, ds.title 
+				from `tabWord Data Set` wds, `tabData Set` ds
+				where wds.word=%s and wds.data_set = ds.name
+				order by ds.title desc""", self.doc.name, as_dict=True)
