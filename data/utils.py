@@ -36,7 +36,7 @@ def get_file_data(fpath):
 		else:
 			return {}, []
 		reader = csv.reader(parts[-1].splitlines())
-		csvrows = [[col for col in row] for row in reader]
+		csvrows = [[unicode(col, encoding="utf-8") for col in row] for row in reader]
 		return headers, csvrows
 	else:
 		return None, None

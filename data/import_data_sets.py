@@ -55,20 +55,6 @@ def add_values(fname, fpath):
 			}).save()
 		except MySQLdb.IntegrityError, e:
 			pass
-
-		# webnotes.conn.sql("""delete from `tabData Value` where data_set=%s""", data_set)
-		# doc = webnotes.doc("Data Value")
-		# for row_id, row in enumerate(data):
-		# 	for col_id, val in enumerate(row):
-		# 		doc.fields = {
-		# 			"doctype": "Data Value",
-		# 			"value": val,
-		# 			"data_set": data_set,
-		# 			"row_id": row_id,
-		# 			"col_id": col_id,
-		# 			"__islocal": 1
-		# 		}
-		# 		doc.save()
 			
 	webnotes.conn.commit()
 	

@@ -16,3 +16,9 @@ class DocType:
 		headers, self.doc.data = get_file_data(get_path("app", "downloads", 
 			"data.gov.in", self.doc.raw_filename))
 		self.doc.max_cols = max([len(r) for r in self.doc.data])
+		
+		self.doc.comment_list = webnotes.conn.sql("""\
+			select comment, comment_by_fullname, creation
+			from `tabComment` where comment_doctype="Data Set"
+			and comment_docname=%s order by creation""", self.doc.name, as_dict=1)
+		
