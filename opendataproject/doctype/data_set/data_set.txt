@@ -2,7 +2,7 @@
  {
   "creation": "2013-09-19 12:43:30", 
   "docstatus": 0, 
-  "modified": "2013-09-19 16:45:37", 
+  "modified": "2013-09-25 12:35:09", 
   "modified_by": "Administrator", 
   "owner": "Administrator"
  }, 
@@ -78,6 +78,12 @@
   "fieldname": "page_name", 
   "fieldtype": "Data", 
   "label": "Page Name"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "row_count", 
+  "fieldtype": "Int", 
+  "label": "Row Count"
  }, 
  {
   "doctype": "DocPerm"

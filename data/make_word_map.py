@@ -1,4 +1,13 @@
-import webnotes, sys
+import sys
+
+if __name__=="__main__":
+	sys.path = [".", "lib", "app"] + sys.path
+	import webnotes
+	webnotes.connect()
+	webnotes.init()
+	start()
+
+import webnotes
 
 eliminate_list = (".", "'s", "'", "*")
 replace_with_space = (".", ",", ";", ":", "-", "/", "(", ")")
@@ -42,8 +51,3 @@ def start():
 	webnotes.conn.sql("""delete from tabWord where `count`< 50""")
 	
 	webnotes.conn.commit()
-
-if __name__=="__main__":
-	webnotes.connect()
-	webnotes.init()
-	start()
