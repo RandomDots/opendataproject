@@ -12,13 +12,16 @@ var DataSetViewer = Class.extend({
 			syncColumnCellResize: true,
 			forceFitColumns: true,
 			rerenderOnResize: true,
+			showHeaderRow: true,
+			headerRowHeight: 30,
+			explicitInitialization: true
 		};
-		this.make();
-		this.resize();
 	},
 	make: function() {
 		var me = this;
-		this.grid = new Slick.Grid("#datasetgrid", datasets, this.columns, this.options);
+		this.columnFilters = {};
+		this.make_dataview();
+		this.grid = new Slick.Grid("#datasetgrid", this.dataView, this.columns, this.options);
 		this.grid.setSelectionModel(new Slick.RowSelectionModel({selectActiveRow: false}));
 		// this.grid.registerPlugin(this.checkboxSelector);
 		// this.grid.setSelectedRows(this.conf.selected_rowids);
@@ -27,8 +30,58 @@ var DataSetViewer = Class.extend({
 			var cell = me.grid.getCellFromEvent(e);
 			me.show_chart(datasets[cell.row]);
 			e.stopPropagation();
-		  }
-		);
+		});
+		
+		$(this.grid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
+			var columnId = $(this).data("columnId");
+			if (columnId != null) {
+				me.columnFilters[columnId] = $.trim($(this).val());
+				me.dataView.refresh();
+			}
+		});
+		
+		this.grid.onHeaderRowCellRendered.subscribe(function(e, args) {
+			$(args.node).empty();
+			$("<input type='text'>")
+				.data("columnId", args.column.id)
+				.val(me.columnFilters[args.column.id])
+				.appendTo(args.node);
+		});
+		this.grid.init();
+		this.resize();
+	},
+	
+	make_dataview: function() {
+		// initialize the model
+		this.dataView = new Slick.Data.DataView({ inlineFilters: true });
+		this.dataView.beginUpdate();
+		this.dataView.setItems(datasets);
+		this.dataView.setFilter(this.inline_filter);
+		this.dataView.endUpdate();
+		
+		var me = this;
+		this.dataView.onRowCountChanged.subscribe(function (e, args) {
+			me.grid.updateRowCount();
+			me.grid.render();
+		});
+
+		this.dataView.onRowsChanged.subscribe(function (e, args) {
+			me.grid.invalidateRows(args.rows);
+			me.grid.render();
+		});
+	},
+	
+	inline_filter: function (item) {
+		var me = window.data_set_viewer;
+		for (var columnId in me.columnFilters) {
+			if (columnId !== undefined && me.columnFilters[columnId] !== "") {
+				var c = me.grid.getColumns()[me.grid.getColumnIndex(columnId)];
+				if(!(c.field==="title" && item[c.field].toLowerCase().indexOf(me.columnFilters[columnId])!==-1)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	},
 
 	resize: function() {

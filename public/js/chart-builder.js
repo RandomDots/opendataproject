@@ -306,7 +306,7 @@ var ChartBuilder = Class.extend({
 				var rgb = me.get_rgb(col.field).join(",");
 				return {
 					value: parseFloat(row[col.field] || 0),
-					color: "rgba("+rgb+", 0.4)",
+					color: "rgba("+rgb+", 0.5)",
 					name: col.name,
 					rgb: rgb
 				}
@@ -323,7 +323,7 @@ var ChartBuilder = Class.extend({
 				}
 				var rgb = me.grid_data[rowid].rgb;
 				return {
-					fillColor: "rgba("+rgb+",0.4)",
+					fillColor: "rgba("+rgb+",0.5)",
 					strokeColor : "rgba("+rgb+",1)",
 					pointColor : "rgba("+rgb+",1)",
 					pointStrokeColor : "#fff",
@@ -345,7 +345,7 @@ var ChartBuilder = Class.extend({
 		if(this.conf.chart_type === "Pie") {
 			$.each(this.chart_data, function(i, d) {
 				$legend.append('<div class="row">\
-						<div class="legend-circle" style="background-color: rgba('+d.rgb+',0.4); \
+						<div class="legend-circle" style="background-color: rgba('+d.rgb+',0.5); \
 							border: 2px solid '+d.color+'"></div>\
 						<span>'+d.name+'</span>\
 					</div>');
@@ -358,7 +358,7 @@ var ChartBuilder = Class.extend({
 				if(!row) return;
 				
 				$legend.append('<div class="row">\
-						<div class="legend-circle" style="background-color: rgba('+row.rgb+',0.4); \
+						<div class="legend-circle" style="background-color: rgba('+row.rgb+',0.5); \
 							border: 2px solid rgb('+row.rgb+')"></div>\
 						<span>'+row[legend_field]+'</span>\
 					</div>');

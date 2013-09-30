@@ -13,6 +13,7 @@
 	<script src="js/all-web.min.js"></script>
 	<script src="lib/js/lib/slickgrid/jquery.event.drag.js"></script>
 	<script src="lib/js/lib/slickgrid/slick.core.js"></script>
+	<script src="lib/js/lib/slickgrid/slick.dataview.js"></script>
 	<script src="lib/js/lib/slickgrid/slick.grid.js"></script>
 	<script src="lib/js/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
 	<script src="lib/js/lib/slickgrid/plugins/slick.cellcopymanager.js"></script>
@@ -30,6 +31,7 @@
 	var datasets = {{ data_sets|json }};
 	$(document).ready(function() {
 		window.data_set_viewer = new DataSetViewer();
+		window.data_set_viewer.make();
 		$(window).on("resize", function() { data_set_viewer.resize });
 	})
 	
