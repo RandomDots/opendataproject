@@ -2,7 +2,7 @@
  {
   "creation": "2013-09-19 12:43:30", 
   "docstatus": 0, 
-  "modified": "2013-09-25 12:35:09", 
+  "modified": "2013-09-30 11:25:11", 
   "modified_by": "Administrator", 
   "owner": "Administrator"
  }, 
@@ -84,6 +84,12 @@
   "fieldname": "row_count", 
   "fieldtype": "Int", 
   "label": "Row Count"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "rating", 
+  "fieldtype": "Int", 
+  "label": "Rating"
  }, 
  {
   "doctype": "DocPerm"

@@ -1,0 +1,87 @@
+<!doctype html>
+ 
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Open Data Project</title>
+	<link rel="stylesheet" href="css/all-web.css" />
+	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick.grid.css" />
+	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick-default-theme.css" />
+	<link rel="stylesheet" href="app/css/chart-builder.css" />
+
+	<script type="text/javascript" src="lib/js/lib/jquery/jquery.min.js"></script>
+	<script src="js/all-web.min.js"></script>
+	<script src="lib/js/lib/slickgrid/jquery.event.drag.js"></script>
+	<script src="lib/js/lib/slickgrid/slick.core.js"></script>
+	<script src="lib/js/lib/slickgrid/slick.grid.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.cellcopymanager.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.cellrangedecorator.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.cellrangeselector.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.cellselectionmodel.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.rowselectionmodel.js"></script>
+	<script src="lib/js/lib/slickgrid/slick.editors.js"></script>
+	<script src="app/js/chart.min.js"></script>
+	<script src="app/js/csv-to-array.js"></script>
+	<script>
+	var data = {{ data_sets|json }};
+
+    var columns = [
+      {id: "title", name: "Title", field: "title", width: 400},
+      {id: "rating", name: "Rating", field: "rating"},
+    ];
+	
+	var resize_grid = function() {
+		var width = $(window).width();
+		columns[0].width = parseInt(width * 0.7);
+		columns[1].width = parseInt(width * 0.3);
+		$("#slickgrid").css("height", $(window).height()-52).css("width", width);
+		grid.resizeCanvas();
+	}
+	
+	$(document).ready(function() {
+		var options = {
+			enableCellNavigation: true,
+			enableColumnReorder: false,
+			syncColumnCellResize: true,
+			forceFitColumns: true,
+			rerenderOnResize: true,
+		};
+		
+		window.grid = new Slick.Grid("#slickgrid", data, columns, options);
+		grid.setSelectionModel(new Slick.RowSelectionModel({selectActiveRow: false}));
+		// this.grid.registerPlugin(this.checkboxSelector);
+		// this.grid.setSelectedRows(this.conf.selected_rowids);
+
+		$(window).on("resize", resize_grid);
+	
+		resize_grid();
+		
+	})
+	
+	</script>
+</head>
+<body>
+	<nav class="navbar navbar-default navbar-fixed" role="navigation">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">	
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+			      <span class="sr-only">Toggle navigation</span>
+			      <span class="icon-bar"></span>
+			      <span class="icon-bar"></span>
+			      <span class="icon-bar"></span>
+			    </button>
+			<a class="navbar-brand" href="#">OpenDataProject.in</a>
+		</div>
+		<div class="collapse navbar-collapse navbar-ex1-collapse">
+			<ul class="nav navbar-nav">
+				<li><a href="#" id="chart-builder-edit">Edit</a></li>
+			</ul>
+		</div>
+	</nav>
+	<div style="margin-top: -21px;">
+		<div id="slickgrid" style="height: 400px; font-size: 11px;">
+		</div>
+	</div> 
+</body>
+</html>

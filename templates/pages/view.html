@@ -1,0 +1,75 @@
+<!doctype html>
+ 
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Chart Builder</title>
+	<link rel="stylesheet" href="css/all-web.css" />
+	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick.grid.css" />
+	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick-default-theme.css" />
+	<link rel="stylesheet" href="app/css/chart-builder.css" />
+
+	<script type="text/javascript" src="lib/js/lib/jquery/jquery.min.js"></script>
+	<script src="js/all-web.min.js"></script>
+	<script src="lib/js/lib/slickgrid/jquery.event.drag.js"></script>
+	<script src="lib/js/lib/slickgrid/slick.core.js"></script>
+	<script src="lib/js/lib/slickgrid/slick.grid.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.cellcopymanager.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.cellrangedecorator.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.cellrangeselector.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.cellselectionmodel.js"></script>
+	<script src="lib/js/lib/slickgrid/plugins/slick.rowselectionmodel.js"></script>
+	<script src="lib/js/lib/slickgrid/slick.editors.js"></script>
+	<script src="lib/js/wn/class.js"></script>
+	<script src="app/js/csv-to-array.js"></script>
+	<script src="app/js/chart.min.js"></script>
+	<script src="app/js/chart-builder.js"></script>
+	<script>	
+	$(document).ready(function() {
+		window.chart_builder = new ChartBuilder({
+			url: "app/data/wb-india.csv",
+			title: "World Bank - India"
+		});
+	
+		$(window).on("resize", function() {
+			window.chart_builder.set_chart_width();
+			window.chart_builder.render_chart();
+		});
+	});
+	
+	</script>
+</head>
+<body>
+	<nav class="navbar navbar-default navbar-fixed" role="navigation">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">	
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+			      <span class="sr-only">Toggle navigation</span>
+			      <span class="icon-bar"></span>
+			      <span class="icon-bar"></span>
+			      <span class="icon-bar"></span>
+			    </button>
+			<a class="navbar-brand" href="#">Simple Chart Builder</a>
+		</div>
+		<div class="collapse navbar-collapse navbar-ex1-collapse">
+			<ul class="nav navbar-nav">
+				<li><a href="#" id="chart-builder-edit">Edit</a></li>
+			</ul>
+		</div>
+	</nav>
+	<div style="margin-top: -21px;">
+		<div class="row" style="margin: 0px;">
+			<div class="col-md-6">
+				<canvas id="chart" height="400" style="margin-top: 15px;">
+				</canvas>
+				<div id="legend"></div>
+			</div>
+			<div class="col-md-6" style="padding: 0px;">
+				<div id="slickgrid" style="height: 400px; font-size: 11px;">
+				</div>
+			</div>
+		</div>
+	</div> 
+</body>
+</html>

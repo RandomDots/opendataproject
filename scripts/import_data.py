@@ -1,5 +1,8 @@
 from __future__ import unicode_literals
 
+import sys
+sys.path = ['.', 'lib', 'app'] + sys.path
+
 import webnotes, utils, MySQLdb, os, json, re
 
 exclude_from_headers = {
@@ -13,7 +16,7 @@ exclude_from_headers = {
 	"/": "-"
 }
 
-def start():
+def import_data():
 	print "building state and district masters..."
 	
 	webnotes.conn.sql("delete from `tabData Set`");
@@ -51,6 +54,7 @@ def add_values(fname, fpath):
 				"raw_filename": fname,
 				"url": headers["url"],
 				"source": "data.gov.in",
+				"row_count": len(data),
 				"__islocal": 1
 			}).save()
 		except MySQLdb.IntegrityError, e:
@@ -94,7 +98,64 @@ def add_regions(data):
 					
 			webnotes.conn.commit()
 
+eliminate_list = (".", "'s", "'", "*")
+replace_with_space = (".", ",", ";", ":", "-", "/", "(", ")")
+common_list = ("Refers", "Provides", "Details", "Constant", "According", "During", "Schemes", 
+	"Approved", "Consists", "Number", "Arrived", "Through")
+
+def make_word_map():
+	webnotes.conn.sql("""delete from tabWord""")
+	webnotes.conn.sql("""delete from `tabWord Data Set`""")
+	webnotes.conn.commit()
+	webnotes.conn.auto_commit_on_many_writes = True
+	for d in webnotes.conn.sql("""select name, ifnull(title, "") as title, 
+		ifnull(description, "") as description 
+		from `tabData Set`""", as_dict=True):
+		sys.stdout.write(".")
+		sys.stdout.flush()
+
+		# cleanup
+		all_text = d.title + d.description
+		all_text = all_text.replace("%", "percent").replace('"', "")
+		for t in replace_with_space:
+			all_text = all_text.replace(t, " ")
+		for t in eliminate_list:
+			all_text = all_text.replace(t,"")
+
+		for word in all_text.split():
+			name = word.title()
+			if len(name) > 5 and (name not in common_list):
+				if not webnotes.conn.exists("Word", name):
+					webnotes.doc({"doctype": "Word", "name": name, "count": 1}).insert()
+				else:
+					webnotes.conn.sql("""update tabWord set `count`=`count` + 1 where name=%s""", name)
+					
+				if not webnotes.conn.sql("""select name from `tabWord Data Set` 
+					where word=%s and data_set=%s""", (name, d.name)):
+					webnotes.doc({"doctype": "Word Data Set", "data_set": d.name, "word": name}).insert()
+	
+	for d in webnotes.conn.sql("select name from tabWord where `count`< 100"):
+		webnotes.delete_doc('Word', d[0])
+	
+	webnotes.conn.commit()
+
+def make_word_count():
+	for ds in webnotes.conn.sql("""select name, raw_filename from `tabData Set`""", as_dict=1):
+		from data.utils import get_file_data
+		from webnotes.utils import get_path
+		
+		if ds.raw_filename:
+			headers, data = get_file_data(get_path("app", "downloads", 
+				"data.gov.in", ds.raw_filename))
+			
+			webnotes.conn.set_value("Data Set", ds.name, "row_count", len(data))
+	
+	webnotes.conn.commit()
+	
 if __name__=="__main__":
-	webnotes.init()
 	webnotes.connect()
-	start()
+	webnotes.init()
+	import_data()
+	make_word_map()
+	make_word_count()
+	
