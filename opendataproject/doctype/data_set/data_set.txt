@@ -2,7 +2,7 @@
  {
   "creation": "2013-09-19 12:43:30", 
   "docstatus": 0, 
-  "modified": "2013-09-30 18:01:08", 
+  "modified": "2013-09-30 19:15:44", 
   "modified_by": "Administrator", 
   "owner": "Administrator"
  }, 
@@ -88,8 +88,14 @@
  {
   "doctype": "DocField", 
   "fieldname": "rating", 
-  "fieldtype": "Int", 
+  "fieldtype": "Float", 
   "label": "Rating"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "ratings_polled", 
+  "fieldtype": "Int", 
+  "label": "Ratings Polled"
  }, 
  {
   "doctype": "DocField", 

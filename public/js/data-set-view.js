@@ -1,10 +1,29 @@
 var DataSetViewer = Class.extend({
 	init: function() {
+		if(localStorage && !localStorage.rated) {
+			localStorage.rated = {};
+		}
 		this.wrapper = $("#datasetgrid");
 		this.columns = [
-		  {id: "title", name: "Title", field: "title", width: 400},
-		  {id: "row_count", name: "Row Count", field: "row_count"},
-		  {id: "rating", name: "Rating", field: "rating"},
+			{id: "title", name: "Title", field: "title", width: 400},
+			{id: "row_count", name: "Row Count", field: "row_count"},
+			{id: "rating", name: "Rating", field: "rating", formatter: 
+				function formatter(row, cell, value, columnDef, dataContext) {
+					var rating = parseFloat(value || 0);
+					var html = "";
+					for(var i=1; i<6; i++) {
+						if(rating >= 1) {
+							html += '<i class="icon-star"></i>';
+						} else if (rating >= 0.5) {
+							html += '<i class="icon-star-half-empty"></i>';
+						} else {
+							html += '<i class="icon-star-empty"></i>';
+						}
+						rating = rating - 1;
+					}
+					return html;
+				}
+			}
 		];
 		this.options = {
 			enableCellNavigation: true,
@@ -16,6 +35,13 @@ var DataSetViewer = Class.extend({
 			headerRowHeight: 30,
 			explicitInitialization: true
 		};
+		this.make_id_map();
+	},
+	make_id_map: function() {
+		this.data_by_id = {};
+		for(var i=0, j=datasets.length; i<j; i++) {
+			this.data_by_id[datasets[i].id] = datasets[i];
+		}
 	},
 	make: function() {
 		var me = this;
@@ -28,7 +54,7 @@ var DataSetViewer = Class.extend({
 
 		this.grid.onClick.subscribe(function (e) {
 			var cell = me.grid.getCellFromEvent(e);
-			me.set_route(cell.row)
+			me.set_route(me.grid.getDataItem(cell.row).id);
 			e.stopPropagation();
 		});
 		
@@ -113,7 +139,7 @@ var DataSetViewer = Class.extend({
 	},
 	
 	show_chart: function(route) {
-		var d = datasets[route];
+		var d = this.data_by_id[route];
 		// var d = this.grid.getData()[route];
 		wn.call({
 			method: "opendataproject.doctype.data_set.data_set.get_settings",
@@ -123,6 +149,7 @@ var DataSetViewer = Class.extend({
 					url: "app/data/" + d.raw_filename,
 					title: d.title,
 					name: d.id,
+					_dataset: d,
 					conf: r.message
 				});
 			}

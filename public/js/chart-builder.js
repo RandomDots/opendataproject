@@ -24,10 +24,16 @@ var ChartBuilder = Class.extend({
 		$("#dataset-discuss")
 			.unbind("click")
 			.on("click", function() { me.show_discussion(); return false;});
+			
+		$("#navbar-rating")
+			.unbind("click")
+			.on("click", function() { me.rate_me(); return false;});
 
 
 		$('[data-for-chart=1]').toggle(true);
 		$('[data-for-list=1]').toggle(false);
+
+		this.show_rating();
 		this.set_title(this.title);
 		this.get_csv(this.url);
 	},
@@ -145,6 +151,7 @@ var ChartBuilder = Class.extend({
 		
 		this.conf_editor.find(".save-conf-editor").click(function() {
 			me.conf.name = me.name;
+			me.conf.transpose = me.conf.transpose ? 1 : 0;
 			wn.call({
 				type: "POST",
 				method: "opendataproject.doctype.data_set.data_set.public_save",
@@ -170,6 +177,59 @@ var ChartBuilder = Class.extend({
 		$.get("discuss", {name:this.name}, function(data) {
 			wn.get_modal("Discuss This Dataset", data).modal("show");
 		});
+		return false;
+	},
+	
+	show_rating: function() {
+		var rating = this._dataset.rating || 0;
+		for(var i=1; i<6; i++) {
+			var $star = $("[data-rating='" + i + "']");
+			if(rating >= 1) {
+				$star.removeClass().addClass("icon-star");
+			} else if (rating >= 0.5) {
+				$star.removeClass().addClass("icon-star-half-empty");
+			} else {
+				$star.removeClass().addClass("icon-star-empty");
+			}
+			rating = rating - 1;
+		}
+	},
+	
+	rate_me: function() {
+		var me = this;
+		if(localStorage && localStorage["rated_" + me.name]) {
+			wn.msgprint("You have already rated this dataset!");
+		} else {
+			var m = wn.get_modal("Rate This Data Set", '<p class="text-muted">5 best, 1 worst</p>\
+				<ul class="rate-me"></ul>');
+			for(var i=1; i<6; i++) {
+				$a = $("<a>").appendTo($("<li>").appendTo(m.find(".rate-me"))).attr("data-rating", i);
+				for(var j=1; j<=i; j++) {
+					$('<i class="icon-star"></i>').appendTo($a);
+				}
+				for(var j=i+1; j<6; j++) {
+					$('<i class="icon-star-empty"></i>').appendTo($a);
+				}
+			}
+			m.modal("show");
+			
+			m.find("[data-rating]").click(function() {
+				m.modal("hide");
+				wn.call({
+					type:"POST",
+					method: "opendataproject.doctype.data_set.data_set.set_rating",
+					args: {
+						name: me.name,
+						rating: $(this).attr("data-rating")
+					},
+					callback: function(r) {
+						me._dataset.rating = r.message;
+						me.show_rating();
+						localStorage["rated_" + me.name]= 1;
+					}
+				});
+			})
+		}
 		return false;
 	},
 	
@@ -434,6 +494,8 @@ var ChartBuilder = Class.extend({
 	},
 	
 	get_rgb: function(str) {
+		if(!str) str = new Date() + "";
+		
 		// str to hash
 		for (var i = 0, hash = 0; i < str.length; hash = str.charCodeAt(i++) + ((hash << 5) - hash));
 
