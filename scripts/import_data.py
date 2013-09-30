@@ -14,7 +14,7 @@ exclude_from_headers = {
 	",": " ",
 	"#": " ",
 	"/": "-",
-	"&amp;": "&"
+	"&amp;": "and"
 }
 
 def import_data():

@@ -60,11 +60,18 @@ var DataSetViewer = Class.extend({
 	
 	show_chart: function(route) {
 		var d = datasets[route];
-		this.chart_view = new ChartBuilder({
-			url: "app/data/" + d.raw_filename,
-			title: d.title,
-			name: d.id
-		});
+		wn.call({
+			method: "opendataproject.doctype.data_set.data_set.get_settings",
+			args: {name: d.id},
+			callback: function(r) {
+				this.chart_view = new ChartBuilder({
+					url: "app/data/" + d.raw_filename,
+					title: d.title,
+					name: d.id,
+					conf: r.message
+				});
+			}
+		})
 	},
 	
 	set_route: function(route) {

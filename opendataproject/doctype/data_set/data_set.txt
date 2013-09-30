@@ -2,7 +2,7 @@
  {
   "creation": "2013-09-19 12:43:30", 
   "docstatus": 0, 
-  "modified": "2013-09-30 11:25:11", 
+  "modified": "2013-09-30 18:01:08", 
   "modified_by": "Administrator", 
   "owner": "Administrator"
  }, 
@@ -90,6 +90,54 @@
   "fieldname": "rating", 
   "fieldtype": "Int", 
   "label": "Rating"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "graph_settings", 
+  "fieldtype": "Section Break", 
+  "label": "Graph Settings"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "chart_type", 
+  "fieldtype": "Data", 
+  "label": "Chart Type"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "legend", 
+  "fieldtype": "Int", 
+  "label": "Legend"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "first_column", 
+  "fieldtype": "Int", 
+  "label": "FIrst Column"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "last_column", 
+  "fieldtype": "Int", 
+  "label": "Last Column"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "head_row", 
+  "fieldtype": "Int", 
+  "label": "Head Row"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "transpose", 
+  "fieldtype": "Check", 
+  "label": "Transpose"
+ }, 
+ {
+  "doctype": "DocField", 
+  "fieldname": "selected_rows", 
+  "fieldtype": "Text", 
+  "label": "Selected Rows"
  }, 
  {
   "doctype": "DocPerm"

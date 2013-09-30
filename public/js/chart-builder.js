@@ -12,6 +12,10 @@ var ChartBuilder = Class.extend({
 		// }
 		var me = this;
 		$.extend(this, opts);
+				
+		if(typeof this.conf.selected_rows==="string")
+			this.conf.selected_rows = JSON.parse(this.conf.selected_rows)
+		
 		$("#chart, #slickgrid").empty();
 		$("#chart-builder-edit")
 			.unbind("click")
@@ -69,6 +73,7 @@ var ChartBuilder = Class.extend({
 					        </div>\
 					        <div class="form-group" style="padding-right: 20px; position: static;">\
 					            <button type="button" class="btn btn-default close-conf-editor">Close</button>\
+					            <button type="button" class="btn btn-success save-conf-editor">Save</button>\
 					        </div>\
 					    </div>\
 					    <div class="col-md-6" style="">\
@@ -101,31 +106,31 @@ var ChartBuilder = Class.extend({
 		this.chart_type_select = this.conf_editor.find("#chart-type")
 			.on("change", function() {
 				me.conf.chart_type = $(this).val();
-				me.legend_colid_select.prop("disabled", me.conf.chart_type === "Pie");
+				me.legend_select.prop("disabled", me.conf.chart_type === "Pie");
 				me.render_chart(); 
 			});
 		
-		this.start_colid_select = this.conf_editor.find("#start-column")
+		this.first_column_select = this.conf_editor.find("#start-column")
 			.on("change", function() { 
-				me.conf.start_colid = parseInt($(this).val() || 0);
+				me.conf.first_column = parseInt($(this).val() || 0);
 				me.render_chart(); 
 			});
 		
-		this.end_colid_select = this.conf_editor.find("#end-column")
+		this.last_column_select = this.conf_editor.find("#end-column")
 			.on("change", function() { 
-				me.conf.end_colid = parseInt($(this).val() || 0);
+				me.conf.last_column = parseInt($(this).val() || 0);
 				me.render_chart(); 
 			});
 		
-		this.legend_colid_select = this.conf_editor.find("#legend-column")
+		this.legend_select = this.conf_editor.find("#legend-column")
 			.on("change", function() { 
-				me.conf.legend_colid = parseInt($(this).val() || 0);
+				me.conf.legend = parseInt($(this).val() || 0);
 				me.render_legend(); 
 			});
 		
-		this.head_rowid_select = this.conf_editor.find("#head-row")
+		this.head_row_select = this.conf_editor.find("#head-row")
 			.on("change", function() { 
-				me.conf.head_rowid = parseInt($(this).val() || 0);
+				me.conf.head_row = parseInt($(this).val() || 0);
 				me.render_grid();
 				me.render_chart();
 			});
@@ -137,7 +142,25 @@ var ChartBuilder = Class.extend({
 				me.set_column_selects();
 				me.render_chart();
 			});
-			
+		
+		this.conf_editor.find(".save-conf-editor").click(function() {
+			me.conf.name = me.name;
+			wn.call({
+				type: "POST",
+				method: "opendataproject.doctype.data_set.data_set.public_save",
+				args: me.conf,
+				callback: function(r) {
+					me.conf_editor.remove();
+					if(r.exc) {
+						wn.msgprint("There were errors.");
+						console.log(r.exc);
+					} else {
+						wn.msgprint("Settings Saved.")
+					}
+				}
+			})
+		})
+		
 		this.set_column_selects();
 		
 		this.conf_editor.show();
@@ -159,24 +182,29 @@ var ChartBuilder = Class.extend({
 			me.original_data = CSVToArray(data);
 			me.set_conf();
 			me.render_grid();
-			me.set_start_end_colid();
+			me.set_start_last_column();
 			me.set_chart_width();
 			me.render_chart();
 		});
 	},
 	
-	set_conf: function(conf) {
-		if(!conf) {
-			conf = {
-				head_rowid: 0,
-				selected_rowids: [0, 1, 2],
-				start_colid: 0,
-				end_colid: 0,
-				legend_colid: 0,
-				chart_type: "Line"
-			};
-		}
-		this.conf = conf;
+	set_conf: function() {
+		var me = this;
+		if(!this.conf) this.conf = {};
+
+		$.each({
+				head_row: 0,
+				selected_rows: [0, 1, 2],
+				first_column: 0,
+				last_column: 0,
+				legend: 0,
+				chart_type: "Line",
+				transpose: 0
+			}, function(k, v) {
+				if(me.conf[k]==null) {
+					me.conf[k] = v
+				}
+			});
 	},
 	
 	get_conf: function() {
@@ -202,7 +230,7 @@ var ChartBuilder = Class.extend({
 		this.grid = new Slick.Grid("#slickgrid", this.objlist, columns, options);
 		this.grid.setSelectionModel(new Slick.RowSelectionModel({selectActiveRow: false}));
 		this.grid.registerPlugin(this.checkboxSelector);
-		this.grid.setSelectedRows(this.conf.selected_rowids);
+		this.grid.setSelectedRows(this.conf.selected_rows);
 		this.grid.getSelectionModel().onSelectedRangesChanged.subscribe(function() {
 			me.render_chart();
 		});
@@ -213,7 +241,7 @@ var ChartBuilder = Class.extend({
 	set_columns: function() {
 		this.columns = [];
 		
-		var head_row = this.data[this.conf.head_rowid];
+		var head_row = this.data[this.conf.head_row];
 		for(var i=0, len=head_row.length; i < len; i++) {
 			var name = head_row[i];
 			var id = (name || "Column " + i).toLowerCase().replace(/ /g, "_");
@@ -223,13 +251,13 @@ var ChartBuilder = Class.extend({
 	
 	set_objlist: function() {
 		this.objlist = [];
-		for(var ri=(this.conf.head_rowid + 1), rlen=this.data.length; ri<rlen; ri++) {
+		for(var ri=(this.conf.head_row + 1), rlen=this.data.length; ri<rlen; ri++) {
 			var row = {};
 			for(var ci=0, clen=this.columns.length; ci < clen; ci++) {
 				var val = this.data[ri][ci];
 				row[this.columns[ci].field] = val;
 				
-				if(ci===this.conf.legend_colid) row["rgb"] = this.get_rgb(val).join(",");
+				if(ci===this.conf.legend) row["rgb"] = this.get_rgb(val).join(",");
 				
 				// TODO better type identifications
 				if(val && !isNaN(val)) this.columns[ci].type = "number";
@@ -238,54 +266,54 @@ var ChartBuilder = Class.extend({
 		}
 	},
 	
-	set_start_end_colid: function() {
-		if(this.conf.start_colid || this.conf.end_colid) return;
-		var start_colid, end_colid, legend_colid;
+	set_start_last_column: function() {
+		if(this.conf.first_column || this.conf.last_column) return;
+		var first_column, last_column, legend;
 		for(var i=0, l=this.columns.length; i<l; i++) {
 			if(this.columns[i].type==="number") {
-				end_colid = i;
-				if(start_colid==null) start_colid = i;
+				last_column = i;
+				if(first_column==null) first_column = i;
 			} else {
-				if(legend_colid==null) legend_colid = i;
+				if(legend==null) legend = i;
 			}
 		}
-		start_colid = ((end_colid-start_colid) > 10) ? (end_colid-10) : start_colid;
-		this.conf.start_colid = start_colid;
-		this.conf.end_colid = end_colid;
-		if(!this.conf.legend_colid) this.conf.legend_colid = legend_colid;
+		first_column = ((last_column-first_column) > 10) ? (last_column-10) : first_column;
+		this.conf.first_column = first_column;
+		this.conf.last_column = last_column;
+		if(!this.conf.legend) this.conf.legend = legend;
 	},
 	
 	set_column_selects: function() {
 		var me = this;
-		var start_colid, end_colid;
-		this.start_colid_select.empty();
-		this.end_colid_select.empty();
-		this.legend_colid_select.empty();
+		var first_column, last_column;
+		this.first_column_select.empty();
+		this.last_column_select.empty();
+		this.legend_select.empty();
 		for(var i=0, l=this.columns.length; i<l; i++) {
 			var name = this.columns[i].name;
-			this.start_colid_select.append('<option value="'+i+'">'+name+'</option>');
+			this.first_column_select.append('<option value="'+i+'">'+name+'</option>');
 			if(this.columns[i].type!=="number"){
-				this.legend_colid_select.append('<option value="'+i+'">'+name+'</option>');
+				this.legend_select.append('<option value="'+i+'">'+name+'</option>');
 			}
 		}
-		this.end_colid_select.html(this.start_colid_select.html());
-		this.start_colid_select.val(this.conf.start_colid);
-		this.end_colid_select.val(this.conf.end_colid);
+		this.last_column_select.html(this.first_column_select.html());
+		this.first_column_select.val(this.conf.first_column);
+		this.last_column_select.val(this.conf.last_column);
 
-		if(this.conf.legend_colid) {this.legend_colid_select.val(this.conf.legend_colid);}
+		if(this.conf.legend) {this.legend_select.val(this.conf.legend);}
 		if(this.conf.chart_type) this.chart_type_select.val(this.conf.chart_type);
 		this.transpose_check.prop("checked", !!this.conf.transpose);
 		
 		var l = this.data.length;
 		if(l > 10) l = 10;
-		this.head_rowid_select.empty();
+		this.head_row_select.empty();
 		for(var i=0; i<l; i++) {
-			this.head_rowid_select.append('<option value="'+i+'">'+this.data[i].join(", ")+'</option>');
+			this.head_row_select.append('<option value="'+i+'">'+this.data[i].join(", ")+'</option>');
 		}
-		this.head_rowid_select.val(this.conf.head_rowid);
+		this.head_row_select.val(this.conf.head_row);
 		
 		// reverse set values so that if not found in select, it sets correct value in conf
-		this.conf.legend_colid = parseInt(this.legend_colid_select.val() || 0);
+		this.conf.legend = parseInt(this.legend_select.val() || 0);
 	},
 	
 	set_chart_width: function() {
@@ -311,12 +339,12 @@ var ChartBuilder = Class.extend({
 	set_chart_data: function() {
 		var me = this;
 		var columns = $.map(this.columns, function(col, i) { 
-			return (i>=me.conf.start_colid  && i<=me.conf.end_colid) ? col : null;
+			return (i>=me.conf.first_column  && i<=me.conf.last_column) ? col : null;
 		});
-		this.conf.selected_rowids = this.grid.getSelectedRows();
+		this.conf.selected_rows = this.grid.getSelectedRows();
 		
 		if(this.conf.chart_type === "Pie") {
-			var row = this.grid_data[this.conf.selected_rowids[0]];
+			var row = this.grid_data[this.conf.selected_rows[0]];
 			var dataset = $.map(columns, function(col) {
 				var rgb = me.get_rgb(col.field).join(",");
 				return {
@@ -328,7 +356,7 @@ var ChartBuilder = Class.extend({
 			});
 			this.chart_data = dataset;
 		} else {
-			var datasets = $.map(this.conf.selected_rowids, function(rowid) {
+			var datasets = $.map(this.conf.selected_rows, function(rowid) {
 				var row = [];
 				var data_row = me.grid_data[rowid];
 				if(!data_row) return null;
@@ -366,7 +394,7 @@ var ChartBuilder = Class.extend({
 					</div>');
 			});
 		} else {
-			var legend_field = this.columns[this.conf.legend_colid].field;
+			var legend_field = this.columns[this.conf.legend].field;
 			
 			$.each(this.grid.getSelectedRows(), function(i, rowid) {
 				var row = me.grid_data[rowid];

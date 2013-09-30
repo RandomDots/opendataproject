@@ -5,6 +5,7 @@
 
 from __future__ import unicode_literals
 import webnotes
+from webnotes.utils import cint
 
 class DocType:
 	def __init__(self, d, dl):
@@ -21,4 +22,25 @@ class DocType:
 			select comment, comment_by_fullname, creation
 			from `tabComment` where comment_doctype="Data Set"
 			and comment_docname=%s order by creation""", self.doc.name, as_dict=1)
-		
+
+
+@webnotes.whitelist(allow_guest=True)
+def public_save(name, legend, head_row, selected_rows, first_column, last_column, chart_type, transpose):	
+	ds = webnotes.bean("Data Set", webnotes.form_dict.name)
+	ds.ignore_permissions = True
+	ds.doc.head_row = head_row
+	ds.doc.legend = ds.doc.legend
+	ds.doc.selected_rows = selected_rows
+	ds.doc.first_column = first_column
+	ds.doc.last_column = last_column
+	ds.doc.chart_type = chart_type
+	ds.doc.transpose = cint(transpose)
+	ds.save()
+
+@webnotes.whitelist(allow_guest=True)
+def get_settings(name):
+	return webnotes.conn.sql("""select legend
+		head_row, selected_rows, first_column, last_column, chart_type, transpose
+		from `tabData Set` where name=%s""", name, as_dict=True)[0]
+	
+	
