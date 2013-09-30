@@ -5,6 +5,7 @@
 	<meta charset="utf-8" />
 	<title>Open Data Project</title>
 	<link rel="stylesheet" href="css/all-web.css" />
+	<link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick.grid.css" />
 	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick-default-theme.css" />
 	<link rel="stylesheet" href="app/css/chart-builder.css" />
@@ -32,10 +33,18 @@
 	$(document).ready(function() {
 		window.data_set_viewer = new DataSetViewer();
 		window.data_set_viewer.make();
-		$(window).on("resize", function() { data_set_viewer.resize });
+		data_set_viewer.set_view_from_route();
+		$(window).on("resize", function() { data_set_viewer.resize(); });
+		$(window).on("hashchange", function() { data_set_viewer.set_view_from_route(); });
 	})
 	
 	</script>
+	
+	<style>
+	body {
+		font-family: Montserrat;
+	}
+	</style>
 </head>
 <body>
 	<nav class="navbar navbar-default navbar-fixed" role="navigation">
@@ -47,21 +56,26 @@
 			      <span class="icon-bar"></span>
 			      <span class="icon-bar"></span>
 			    </button>
-			<a class="navbar-brand" href="#" onclick = "data_set_viewer.show();">OpenDataProject.in</a>
+			<a class="navbar-brand" href="#home"><i class="icon-home"></i> OpenDataProject.in</a>
 		</div>
 		<div class="collapse navbar-collapse navbar-ex1-collapse">
+			<p class="navbar-text" id="navbar-help" data-for-list=1>Click on Data Set to View</p>
 			<ul class="nav navbar-nav">
-				<li><a href="#" id="chart-builder-edit" style="display: none;">Edit</a></li>
+				<li><a href="#" id="chart-builder-edit" data-for-chart=1>
+					<i class="icon-bar-chart"></i> Edit</a></li>
+				<li><a href="#" id="dataset-discuss" data-for-chart=1>
+					<i class="icon-comments"></i> Discuss</a></li>
 			</ul>
 		</div>
 	</nav>
-	<div style="margin-top: -21px;" id="data-set-view">
+	<div style="margin-top: -21px;" id="data-set-view" data-for-list=1>
 		<div id="datasetgrid" style="height: 400px; font-size: 11px;">
 		</div>
 	</div> 
-	<div style="margin-top: -21px; display: none;" id="chart-view">
+	<div style="margin-top: -21px;" id="chart-view" data-for-chart=1>
 		<div class="row" style="margin: 0px;">
 			<div class="col-md-6">
+				<h3 id="dataset-title"></h3>
 				<canvas id="chart" height="400" style="margin-top: 15px;">
 				</canvas>
 				<div id="legend"></div>

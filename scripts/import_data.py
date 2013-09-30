@@ -13,7 +13,8 @@ exclude_from_headers = {
 	"%": "percent",
 	",": " ",
 	"#": " ",
-	"/": "-"
+	"/": "-",
+	"&amp;": "and"
 }
 
 def import_data():

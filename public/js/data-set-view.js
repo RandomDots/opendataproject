@@ -28,7 +28,7 @@ var DataSetViewer = Class.extend({
 
 		this.grid.onClick.subscribe(function (e) {
 			var cell = me.grid.getCellFromEvent(e);
-			me.show_chart(datasets[cell.row]);
+			me.set_route(cell.row)
 			e.stopPropagation();
 		});
 		
@@ -48,6 +48,8 @@ var DataSetViewer = Class.extend({
 				.appendTo(args.node);
 		});
 		this.grid.init();
+		
+		this.show();
 		this.resize();
 	},
 	
@@ -83,7 +85,7 @@ var DataSetViewer = Class.extend({
 		}
 		return true;
 	},
-
+	
 	resize: function() {
 		if(this.chart_view) {
 			this.chart_view.resize();
@@ -104,18 +106,39 @@ var DataSetViewer = Class.extend({
 	
 	show: function() {
 		this.chart_view = null;
-		$("head title, .navbar-brand").text("OpenDataProject.in");
-		$("#chart-view").toggle(false);
-		$("#data-set-view").toggle(true);
+		$(".navbar-brand").html("<i class='icon-home'></i> OpenDataProject.in");
+		$('[data-for-chart=1]').toggle(false);
+		$('[data-for-list=1]').toggle(true);
 		this.resize_data_set_grid();
 	},
 	
-	show_chart: function(d) {
-		$("#data-set-view").toggle(false);
-		$("#chart-view").toggle(true);
-		this.chart_view = new ChartBuilder({
-			url: "app/data/" + d.raw_filename,
-			title: d.title
-		});
+	show_chart: function(route) {
+		var d = datasets[route];
+		// var d = this.grid.getData()[route];
+		wn.call({
+			method: "opendataproject.doctype.data_set.data_set.get_settings",
+			args: {name: d.id},
+			callback: function(r) {
+				this.chart_view = new ChartBuilder({
+					url: "app/data/" + d.raw_filename,
+					title: d.title,
+					name: d.id,
+					conf: r.message
+				});
+			}
+		})
+	},
+	
+	set_route: function(route) {
+		window.location.hash = route;		
+	},
+	
+	set_view_from_route: function() {
+		var route = window.location.hash.slice(1);
+		if(route==="home") {
+			this.show();
+		} else {
+			this.show_chart(route);
+		}
 	}
 })
