@@ -1,33 +1,6 @@
-<!doctype html>
- 
-<html lang="en">
-<head>
-	<meta charset="utf-8" />
-	<title>Open Data Project</title>
-	<link rel="stylesheet" href="css/all-web.css" />
-	<link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick.grid.css" />
-	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick-default-theme.css" />
-	<link rel="stylesheet" href="app/css/chart-builder.css" />
+{% extends "app/templates/includes/base.html" %}
 
-	<script type="text/javascript" src="lib/js/lib/jquery/jquery.min.js"></script>
-	<script src="js/all-web.min.js"></script>
-	<script src="lib/js/lib/slickgrid/jquery.event.drag.js"></script>
-	<script src="lib/js/lib/slickgrid/slick.core.js"></script>
-	<script src="lib/js/lib/slickgrid/slick.dataview.js"></script>
-	<script src="lib/js/lib/slickgrid/slick.grid.js"></script>
-	<script src="lib/js/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
-	<script src="lib/js/lib/slickgrid/plugins/slick.cellcopymanager.js"></script>
-	<script src="lib/js/lib/slickgrid/plugins/slick.cellrangedecorator.js"></script>
-	<script src="lib/js/lib/slickgrid/plugins/slick.cellrangeselector.js"></script>
-	<script src="lib/js/lib/slickgrid/plugins/slick.cellselectionmodel.js"></script>
-	<script src="lib/js/lib/slickgrid/plugins/slick.rowselectionmodel.js"></script>
-	<script src="lib/js/lib/slickgrid/slick.editors.js"></script>
-	<script src="lib/js/wn/class.js"></script>
-	<script src="app/js/chart.min.js"></script>
-	<script src="app/js/csv-to-array.js"></script>
-	<script src="app/js/chart-builder.js"></script>
-	<script src="app/js/data-set-view.js"></script>
+{% block javascript %}
 	<script>
 	var datasets = {{ data_sets|json }};
 	$(document).ready(function() {
@@ -39,52 +12,47 @@
 	})
 	
 	</script>
-	
+{% endblock %}
+
+{% block style %}
 	<style>
 	body {
 		font-family: Montserrat;
 	}
+	
+	.navbar-default {
+		background-color: white;
+		border-color: white;
+	}
+	
+	.slick-headerrow-column {
+		background-color: #ecf0f1;
+	}
+	
+	.slick-cell-checkboxsel {
+		
+	}
+	
+	.slick-header-columns {
+		
+	}
+	
+	@media (min-width: 992px) {
+		#slickgrid {
+			border-left: 2px solid #FFA700;
+		}
+	}
 	</style>
-</head>
-<body>
-	<nav class="navbar navbar-default navbar-fixed" role="navigation">
-		<!-- Brand and toggle get grouped for better mobile display -->
-		<div class="navbar-header">	
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-			      <span class="sr-only">Toggle navigation</span>
-			      <span class="icon-bar"></span>
-			      <span class="icon-bar"></span>
-			      <span class="icon-bar"></span>
-			    </button>
-			<a class="navbar-brand" href="#home"><i class="icon-home"></i> OpenDataProject.in</a>
-		</div>
-		<div class="collapse navbar-collapse navbar-ex1-collapse">
-			<p class="navbar-text" id="navbar-help" data-for-list=1>Click on Data Set to View</p>
-			<ul class="nav navbar-nav">
-				<li><a href="#" id="chart-builder-edit" data-for-chart=1>
-					<i class="icon-bar-chart"></i> Edit</a></li>
-				<li><a href="#" id="dataset-discuss" data-for-chart=1>
-					<i class="icon-comments"></i> Discuss</a></li>
-			</ul>
-			<ul class="nav navbar-nav pull-right">
-				<li><a href="#" id="navbar-rating" data-for-chart=1>
-					<i class="icon-star" data-rating=1></i>
-					<i class="icon-star" data-rating=2></i>
-					<i class="icon-star" data-rating=3></i>
-					<i class="icon-star" data-rating=4></i>
-					<i class="icon-star-half-empty" data-rating=5></i>
-	</a></li>
-				<li><a href="about">About</a></li>
-			</ul>
-		</div>
-	</nav>
-	<div style="margin-top: -21px;" id="data-set-view" data-for-list=1>
+{% endblock %}
+
+{% block content %}
+	<div id="data-set-view" data-for-list=1>
 		<div id="datasetgrid" style="height: 400px; font-size: 11px;">
 		</div>
 	</div> 
 	<div style="margin-top: -21px;" id="chart-view" data-for-chart=1>
 		<div class="row" style="margin: 0px;">
-			<div class="col-md-6">
+			<div class="col-md-6" id="left-pane">
 				<h3 id="dataset-title"></h3>
 				<canvas id="chart" height="400" style="margin-top: 15px;">
 				</canvas>
@@ -96,5 +64,4 @@
 			</div>
 		</div>
 	</div> 
-</body>
-</html>
+{% endblock %}
