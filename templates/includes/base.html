@@ -6,6 +6,7 @@
 	<title>Open Data Project</title>
 	<link rel="stylesheet" href="css/all-web.css" />
 	<link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick.grid.css" />
 	<link rel="stylesheet" href="lib/js/lib/slickgrid/slick-default-theme.css" />
 	<link rel="stylesheet" href="app/css/chart-builder.css" />
@@ -30,6 +31,21 @@
 	<script src="app/js/data-set-view.js"></script>
 	{% block javascript %}{% endblock %}
 	{% block style %}{% endblock %}
+	
+	<style>
+		body {
+			font-family: Montserrat, sans-serif;
+		}
+		
+		h1, h2, h3, h4, h5, h6 {
+			font-family: Open Sans, sans-serif;
+		}
+		
+		h1 {
+			letter-spacing: -1px;
+		}
+	</style>
+	
 </head>
 <body>
 	<nav class="navbar navbar-default navbar-fixed" role="navigation">
@@ -63,7 +79,7 @@
 					<i class="icon-star" data-rating=4></i>
 					<i class="icon-star-half-empty" data-rating=5></i>
 					</a></li>
-				<li><a href="about">About</a></li>
+				<li><a href="about-this-project">About</a></li>
 			</ul>
 		</div>
 	</nav>
