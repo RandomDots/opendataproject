@@ -11,6 +11,8 @@ var ChartBuilder = Class.extend({
 		// 	
 		// }
 		$.extend(this, opts);
+		$("#chart, #slickgrid").empty();
+		$("#chart-builder-edit").toggle(true);
 		this.set_title(this.title);
 		this.make_conf_editor();
 		this.get_csv(this.url);
@@ -94,6 +96,10 @@ var ChartBuilder = Class.extend({
 	get_csv: function(url) {
 		var me = this;
 		$.get(url, function(data) {
+			if(data[0]=="-") {
+				data = data.split("-----\n").slice(2).join("-----\n");
+			}
+			
 			me.data = CSVToArray(data);
 			me.set_conf();
 			me.render_grid();
@@ -155,7 +161,7 @@ var ChartBuilder = Class.extend({
 		var head_row = this.data[this.conf.head_rowid];
 		for(var i=0, len=head_row.length; i < len; i++) {
 			var name = head_row[i];
-			var id = name.toLowerCase().replace(/ /g, "_");
+			var id = (name || "Column " + i).toLowerCase().replace(/ /g, "_");
 			this.columns.push({id: id, name: name, field: id});
 		}
 	},
@@ -204,6 +210,11 @@ var ChartBuilder = Class.extend({
 	set_chart_width: function() {
 		var $chart = $("#chart");
 		$chart.attr("width", $chart.parent().width());
+	},
+
+	resize: function() {
+		this.set_chart_width();
+		this.render_chart();
 	},
 	
 	render_chart: function(opts) {
