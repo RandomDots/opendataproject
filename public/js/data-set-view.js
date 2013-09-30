@@ -162,7 +162,7 @@ var DataSetViewer = Class.extend({
 	
 	set_view_from_route: function() {
 		var route = window.location.hash.slice(1);
-		if(route==="home") {
+		if(route==="home" || !route) {
 			this.show();
 		} else {
 			this.show_chart(route);

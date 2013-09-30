@@ -24,6 +24,14 @@ var ChartBuilder = Class.extend({
 		$("#dataset-discuss")
 			.unbind("click")
 			.on("click", function() { me.show_discussion(); return false;});
+
+		$("#dataset-download")
+			.unbind("click")
+			.on("click", function() { window.open(me._dataset.url); return false; });
+
+		$("#dataset-help")
+			.unbind("click")
+			.on("click", function() { wn.msgprint(me._dataset.description); return false;});
 			
 		$("#navbar-rating")
 			.unbind("click")
@@ -223,7 +231,7 @@ var ChartBuilder = Class.extend({
 						rating: $(this).attr("data-rating")
 					},
 					callback: function(r) {
-						me._dataset.rating = r.message;
+						me._dataset.rating = parseInt(r.message);
 						me.show_rating();
 						localStorage["rated_" + me.name]= 1;
 					}
