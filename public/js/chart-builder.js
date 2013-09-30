@@ -13,17 +13,25 @@ var ChartBuilder = Class.extend({
 		var me = this;
 		$.extend(this, opts);
 		$("#chart, #slickgrid").empty();
-		$("#chart-builder-edit").toggle(true)
+		$("#chart-builder-edit")
 			.unbind("click")
 			.on("click", function() { me.make_conf_editor(); return false;});
+
+		$("#dataset-discuss")
+			.unbind("click")
+			.on("click", function() { me.show_discussion(); return false;});
+
+
+		$('[data-for-chart=1]').toggle(true);
+		$('[data-for-list=1]').toggle(false);
 		this.set_title(this.title);
 		this.get_csv(this.url);
 	},
 	
 	set_title: function(title) {
-		if(!title) title = "Chart Builder";
-		$("head title").text(title);
-		$(".navbar-brand").text(title);
+		if(!title) title = "Title Not Set";
+		$("#dataset-title").text(title);
+		
 	},
 	
 	make_conf_editor: function() {
@@ -134,11 +142,18 @@ var ChartBuilder = Class.extend({
 		this.conf_editor.show();
 	},
 	
+	show_discussion: function() {
+		$.get("discuss", {name:this.name}, function(data) {
+			wn.get_modal("Discuss This Dataset", data).modal("show");
+		});
+		return false;
+	},
+	
 	get_csv: function(url) {
 		var me = this;
 		$.get(url, function(data) {
 			if(data[0]=="-") {
-				data = data.split("-----\n").slice(2).join("-----\n");
+				data = data.split("}\n-----\n").slice(-1)[0]
 			}
 			me.original_data = CSVToArray(data);
 			me.set_conf();

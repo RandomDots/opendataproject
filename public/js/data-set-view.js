@@ -14,23 +14,24 @@ var DataSetViewer = Class.extend({
 			rerenderOnResize: true,
 		};
 		this.make();
+		this.show();
 		this.resize();
 	},
 	make: function() {
 		var me = this;
+				
 		this.grid = new Slick.Grid("#datasetgrid", datasets, this.columns, this.options);
-		this.grid.setSelectionModel(new Slick.RowSelectionModel({selectActiveRow: false}));
 		// this.grid.registerPlugin(this.checkboxSelector);
 		// this.grid.setSelectedRows(this.conf.selected_rowids);
 
 		this.grid.onClick.subscribe(function (e) {
 			var cell = me.grid.getCellFromEvent(e);
-			me.show_chart(datasets[cell.row]);
+			me.set_route(cell.row)
 			e.stopPropagation();
 		  }
 		);
 	},
-
+	
 	resize: function() {
 		if(this.chart_view) {
 			this.chart_view.resize();
@@ -51,18 +52,31 @@ var DataSetViewer = Class.extend({
 	
 	show: function() {
 		this.chart_view = null;
-		$("head title, .navbar-brand").text("OpenDataProject.in");
-		$("#chart-view").toggle(false);
-		$("#data-set-view").toggle(true);
+		$(".navbar-brand").html("<i class='icon-home'></i> OpenDataProject.in");
+		$('[data-for-chart=1]').toggle(false);
+		$('[data-for-list=1]').toggle(true);
 		this.resize_data_set_grid();
 	},
 	
-	show_chart: function(d) {
-		$("#data-set-view").toggle(false);
-		$("#chart-view").toggle(true);
+	show_chart: function(route) {
+		var d = datasets[route];
 		this.chart_view = new ChartBuilder({
 			url: "app/data/" + d.raw_filename,
-			title: d.title
+			title: d.title,
+			name: d.id
 		});
+	},
+	
+	set_route: function(route) {
+		window.location.hash = route;		
+	},
+	
+	set_view_from_route: function() {
+		var route = window.location.hash.slice(1);
+		if(route==="home") {
+			this.show();
+		} else {
+			this.show_chart(route);
+		}
 	}
 })
