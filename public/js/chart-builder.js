@@ -92,7 +92,8 @@ var ChartBuilder = Class.extend({
 				
 		this.chart_type_select = this.conf_editor.find("#chart-type")
 			.on("change", function() {
-				me.conf.chart_type = $(this).val(); 
+				me.conf.chart_type = $(this).val();
+				me.legend_colid_select.prop("disabled", me.conf.chart_type === "Pie");
 				me.render_chart(); 
 			});
 		
@@ -208,23 +209,18 @@ var ChartBuilder = Class.extend({
 	set_objlist: function() {
 		this.objlist = [];
 		for(var ri=(this.conf.head_rowid + 1), rlen=this.data.length; ri<rlen; ri++) {
-			var row = {rgb: this.random_rgb().join(",")};
+			var row = {};
 			for(var ci=0, clen=this.columns.length; ci < clen; ci++) {
 				var val = this.data[ri][ci];
 				row[this.columns[ci].field] = val;
+				
+				if(ci===this.conf.legend_colid) row["rgb"] = this.get_rgb(val).join(",");
 				
 				// TODO better type identifications
 				if(val && !isNaN(val)) this.columns[ci].type = "number";
 			}
 			this.objlist.push(row);
 		}
-	},
-	
-	random_rgb: function() {
-		var r = Math.floor(Math.random() * 256),
-	        g = Math.floor(Math.random() * 256),
-	        b = Math.floor(Math.random() * 256);
-		return [r, g, b];
 	},
 	
 	set_start_end_colid: function() {
@@ -247,6 +243,9 @@ var ChartBuilder = Class.extend({
 	set_column_selects: function() {
 		var me = this;
 		var start_colid, end_colid;
+		this.start_colid_select.empty();
+		this.end_colid_select.empty();
+		this.legend_colid_select.empty();
 		for(var i=0, l=this.columns.length; i<l; i++) {
 			var name = this.columns[i].name;
 			this.start_colid_select.append('<option value="'+i+'">'+name+'</option>');
@@ -257,7 +256,8 @@ var ChartBuilder = Class.extend({
 		this.end_colid_select.html(this.start_colid_select.html());
 		this.start_colid_select.val(this.conf.start_colid);
 		this.end_colid_select.val(this.conf.end_colid);
-		if(this.conf.legend_colid) this.legend_colid_select.val(this.conf.legend_colid);
+
+		if(this.conf.legend_colid) {this.legend_colid_select.val(this.conf.legend_colid);}
 		if(this.conf.chart_type) this.chart_type_select.val(this.conf.chart_type);
 		this.transpose_check.prop("checked", !!this.conf.transpose);
 		
@@ -268,6 +268,9 @@ var ChartBuilder = Class.extend({
 			this.head_rowid_select.append('<option value="'+i+'">'+this.data[i].join(", ")+'</option>');
 		}
 		this.head_rowid_select.val(this.conf.head_rowid);
+		
+		// reverse set values so that if not found in select, it sets correct value in conf
+		this.conf.legend_colid = parseInt(this.legend_colid_select.val() || 0);
 	},
 	
 	set_chart_width: function() {
@@ -283,11 +286,7 @@ var ChartBuilder = Class.extend({
 	render_chart: function(opts) {
 		if(!this.grid) return;
 		if(!opts) opts = {animationSteps: 20};
-		if(this.conf.chart_type === "Pie") {
-			this.set_pie_chart_data();
-		} else {
-			this.set_chart_data();
-		}
+		this.set_chart_data();
 		var context = document.getElementById("chart").getContext("2d");
 		this.chart = new Chart(context)[this.conf.chart_type](this.chart_data, opts);
 		this.render_legend();
@@ -300,39 +299,71 @@ var ChartBuilder = Class.extend({
 			return (i>=me.conf.start_colid  && i<=me.conf.end_colid) ? col : null;
 		});
 		this.conf.selected_rowids = this.grid.getSelectedRows();
-		var datasets = $.map(this.conf.selected_rowids, function(rowid) {
-			var row = [];
-			for(var i=0, l=columns.length; i<l; i++) {
-				row.push(parseFloat(me.grid_data[rowid][columns[i].field] || 0));
-			}
-			var rgb = me.grid_data[rowid].rgb;
-			return {
-				fillColor: "rgba("+rgb+",0.5)",
-				strokeColor : "rgba("+rgb+",1)",
-				pointColor : "rgba("+rgb+",1)",
-				pointStrokeColor : "#fff",
-				data : row
-			};
-		});
 		
-		this.chart_data = {
-			labels : $.map(columns, function(v) { return v.name; }),
-			datasets : datasets
-		};
+		if(this.conf.chart_type === "Pie") {
+			var row = this.grid_data[this.conf.selected_rowids[0]];
+			var dataset = $.map(columns, function(col) {
+				var rgb = me.get_rgb(col.field).join(",");
+				return {
+					value: parseFloat(row[col.field] || 0),
+					color: "rgba("+rgb+", 0.4)",
+					name: col.name,
+					rgb: rgb
+				}
+			});
+			this.chart_data = dataset;
+		} else {
+			var datasets = $.map(this.conf.selected_rowids, function(rowid) {
+				var row = [];
+				var data_row = me.grid_data[rowid];
+				if(!data_row) return null;
+				
+				for(var i=0, l=columns.length; i<l; i++) {
+					row.push(parseFloat(data_row[columns[i].field] || 0));
+				}
+				var rgb = me.grid_data[rowid].rgb;
+				return {
+					fillColor: "rgba("+rgb+",0.4)",
+					strokeColor : "rgba("+rgb+",1)",
+					pointColor : "rgba("+rgb+",1)",
+					pointStrokeColor : "#fff",
+					data : row
+				};
+			});
+		
+			this.chart_data = {
+				labels : $.map(columns, function(v) { return v.name; }),
+				datasets : datasets
+			};
+		}
 	},
 	
 	render_legend: function() {
 		var me = this;
-		var legend_field = this.columns[this.conf.legend_colid].field;
 		var $legend = $("#legend").empty();
-		$.each(this.grid.getSelectedRows(), function(i, rowid) {
-			var row = me.grid_data[rowid];
-			$legend.append('<div class="row">\
-					<div class="legend-circle" style="background-color: rgba('+row.rgb+',0.5); \
-						border: 2px solid rgb('+row.rgb+')"></div>\
-					<span>'+row[legend_field]+'</span>\
-				</div>');
-		});
+		
+		if(this.conf.chart_type === "Pie") {
+			$.each(this.chart_data, function(i, d) {
+				$legend.append('<div class="row">\
+						<div class="legend-circle" style="background-color: rgba('+d.rgb+',0.4); \
+							border: 2px solid '+d.color+'"></div>\
+						<span>'+d.name+'</span>\
+					</div>');
+			});
+		} else {
+			var legend_field = this.columns[this.conf.legend_colid].field;
+			
+			$.each(this.grid.getSelectedRows(), function(i, rowid) {
+				var row = me.grid_data[rowid];
+				if(!row) return;
+				
+				$legend.append('<div class="row">\
+						<div class="legend-circle" style="background-color: rgba('+row.rgb+',0.4); \
+							border: 2px solid rgb('+row.rgb+')"></div>\
+						<span>'+row[legend_field]+'</span>\
+					</div>');
+			});
+		}
 	},
 	
 	set_grid_height: function() {
@@ -357,5 +388,24 @@ var ChartBuilder = Class.extend({
 	            return r[c];
 	        });
 	    });
+	},
+	
+	get_rgb: function(str) {
+		// str to hash
+		for (var i = 0, hash = 0; i < str.length; hash = str.charCodeAt(i++) + ((hash << 5) - hash));
+
+		// int/hash to hex
+		for (var i = 0, colour = "#"; i < 3; colour += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2));
+
+		return this.hex_to_rgb(colour);
+	},
+	
+	hex_to_rgb: function(hex) {
+		function hexToR(h) {return parseInt((cutHex(h)).substring(0,2),16)}
+		function hexToG(h) {return parseInt((cutHex(h)).substring(2,4),16)}
+		function hexToB(h) {return parseInt((cutHex(h)).substring(4,6),16)}
+		function cutHex(h) {return (h.charAt(0)=="#") ? h.substring(1,7):h}
+		
+		return [hexToR(hex), hexToG(hex), hexToB(hex)];
 	}
 });
